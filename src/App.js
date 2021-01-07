@@ -1,10 +1,23 @@
 import enTranslations from "@shopify/polaris/locales/en.json";
-import { AppProvider, Page, Card } from "@shopify/polaris";
+
+import {
+  AppProvider,
+  Page,
+  Card,
+  Icon,
+  TextField,
+  Layout,
+  Button,
+  Banner,
+  ResourceList,
+  ResourceItem,
+  Pagination,
+} from "@shopify/polaris";
+
 import { useState, useCallback, useEffect } from "react";
-import { Icon, TextField } from "@shopify/polaris";
 import { SearchMinor } from "@shopify/polaris-icons";
 import axios from "axios";
-import Result from "./components/Result";
+
 import { debounce } from "lodash";
 
 const apiKey = "172b6f36";
@@ -19,9 +32,8 @@ function App() {
       .get(`${url}?s=${title}&type=movie&page=1&apikey=${apiKey}`)
       .then(function (response) {
         const { Search, totalResults } = response.data;
-        console.log(Search);
+        setTotalResults(totalResults ? totalResults : 0);
         setResults(Search ? Search : []);
-        console.log(response);
       })
       .catch(function (error) {
         console.log(error);
@@ -29,7 +41,7 @@ function App() {
   };
 
   const debouncedApiCall = useCallback(
-    debounce(title => getMovies(title), 2000),
+    debounce(title => getMovies(title), 500),
     []
   );
 
@@ -43,26 +55,99 @@ function App() {
 
   const [results, setResults] = useState([]);
 
+  const [nominations, setNominations] = useState([]);
+
+  const [totalResults, setTotalResults] = useState([]);
+
+  const Result = movie => {
+    const { Title, Year } = movie;
+    return (
+      <ResourceItem>
+        <p>{`${Title} - ${Year}`}</p>
+        <Button
+          disabled={nominations.includes(movie) || nominations.length >= 5}
+          onClick={() => setNominations([...nominations, movie])}
+        >
+          Nominate
+        </Button>
+      </ResourceItem>
+    );
+  };
+
+  const Nomination = (movie, id, index) => {
+    const { Title, Year, imdbID } = movie;
+    const rank = index + 1;
+    return (
+      <ResourceItem>
+        <p>{`${rank}. ${Title} - ${Year}`}</p>
+        <Button
+          onClick={() =>
+            setNominations(
+              nominations.filter(nomination => nomination.imdbID !== imdbID)
+            )
+          }
+        >
+          Remove
+        </Button>
+      </ResourceItem>
+    );
+  };
+
   return (
     <AppProvider i18n={enTranslations}>
       <Page title="The Shoppies">
-        <Card sectioned>
-          <TextField
-            onChange={handleChange}
-            label="Tags"
-            value={searchQuery}
-            prefix={<Icon source={SearchMinor} color="inkLighter" />}
-            placeholder="Search"
-          />
-        </Card>
-        <div style={{ display: "flex" }}>
-          <Card sectioned>
-            <h1>Results for {searchQuery}</h1>
-            {results.map(movie => (
-              <Result title={movie.Title} year={movie.Year}></Result>
-            ))}
-          </Card>
-        </div>
+        <Layout>
+          {nominations.length >= 5 && (
+            <Layout.Section>
+              <Banner title="You're all done!">
+                <p>You've reached the maximum of 5 nominations</p>
+              </Banner>
+            </Layout.Section>
+          )}
+          <Layout.Section>
+            <Card sectioned>
+              <TextField
+                onChange={handleChange}
+                label="Movie title"
+                value={searchQuery}
+                prefix={<Icon source={SearchMinor} color="inkLighter" />}
+                placeholder="Search"
+              />
+            </Card>
+          </Layout.Section>
+          <Layout.Section oneHalf>
+            <Card title={`Results for ${searchQuery}`}>
+              <ResourceList
+                resourceName={{ singular: "movie", plural: "movies" }}
+                items={results}
+                renderItem={Result}
+                showHeader
+                totalItemsCount={totalResults}
+              />
+              <Card.Section>
+                <Pagination
+                  hasPrevious
+                  onPrevious={() => {
+                    console.log("Previous");
+                  }}
+                  hasNext
+                  onNext={() => {
+                    console.log("Next");
+                  }}
+                />
+              </Card.Section>
+            </Card>
+          </Layout.Section>
+          <Layout.Section oneHalf>
+            <Card title="Nominations">
+              <ResourceList
+                resourceName={{ singular: "customer", plural: "customers" }}
+                items={nominations}
+                renderItem={Nomination}
+              />
+            </Card>
+          </Layout.Section>
+        </Layout>
       </Page>
     </AppProvider>
   );
