@@ -97,7 +97,7 @@ function App() {
 
   return (
     <AppProvider i18n={enTranslations}>
-      <Page title="The Shoppies">
+      <Page title="The Shoppies 🎥">
         <Layout>
           {nominations.length >= 5 && (
             <Layout.Section>
@@ -148,7 +148,7 @@ function App() {
               <Card.Section>
                 <p>
                   Movies you nominate will appear here. You may nominate up to a
-                  maxium of 5 movies
+                  maxium of 5 movies.
                 </p>
               </Card.Section>
               <ResourceList
