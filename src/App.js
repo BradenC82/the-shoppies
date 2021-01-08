@@ -55,11 +55,20 @@ function App() {
 
   const [results, setResults] = useState([]);
 
-  const [nominations, setNominations] = useState([]);
+  const savedNominations = localStorage.getItem("nominations");
+
+  const [nominations, setNominations] = useState(
+    savedNominations ? JSON.parse(savedNominations) : []
+  );
 
   const [totalResults, setTotalResults] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    console.log("updated localStorage");
+    localStorage.setItem("nominations", JSON.stringify(nominations));
+  }, [nominations]);
 
   const Result = movie => {
     const { Title, Year } = movie;
