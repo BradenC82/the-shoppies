@@ -148,7 +148,7 @@ function App() {
               <Card.Section>
                 <p>
                   Movies you nominate will appear here. You may nominate up to a
-                  maxium of 5 movies.
+                  maximum of 5 movies.
                 </p>
               </Card.Section>
               <ResourceList
