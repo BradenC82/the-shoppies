@@ -27,9 +27,9 @@ const url = `http://www.omdbapi.com/`;
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const getMovies = title => {
+  const getMovies = (title, pageNumber) => {
     axios
-      .get(`${url}?s=${title}&type=movie&page=1&apikey=${apiKey}`)
+      .get(`${url}?s=${title}&type=movie&page=${pageNumber}&apikey=${apiKey}`)
       .then(function (response) {
         const { Search, totalResults } = response.data;
         setTotalResults(totalResults ? totalResults : 0);
@@ -41,7 +41,7 @@ function App() {
   };
 
   const debouncedApiCall = useCallback(
-    debounce(title => getMovies(title), 500),
+    debounce(title => getMovies(title, 1), 500),
     []
   );
 
@@ -58,6 +58,8 @@ function App() {
   const [nominations, setNominations] = useState([]);
 
   const [totalResults, setTotalResults] = useState([]);
+
+  const [currentPage, setCurrentPage] = useState(1);
 
   const Result = movie => {
     const { Title, Year } = movie;
@@ -116,7 +118,7 @@ function App() {
             </Card>
           </Layout.Section>
           <Layout.Section oneHalf>
-            <Card title={`Results for ${searchQuery}`}>
+            <Card title={`Results for ${searchQuery ? searchQuery : "..."}`}>
               <ResourceList
                 resourceName={{ singular: "movie", plural: "movies" }}
                 items={results}
@@ -126,13 +128,16 @@ function App() {
               />
               <Card.Section>
                 <Pagination
-                  hasPrevious
+                  label="Results"
+                  hasPrevious={currentPage > 1}
                   onPrevious={() => {
-                    console.log("Previous");
+                    getMovies(searchQuery, currentPage - 1);
+                    setCurrentPage(currentPage - 1);
                   }}
-                  hasNext
+                  hasNext={currentPage * 10 < totalResults}
                   onNext={() => {
-                    console.log("Next");
+                    getMovies(searchQuery, currentPage + 1);
+                    setCurrentPage(currentPage + 1);
                   }}
                 />
               </Card.Section>
@@ -140,6 +145,12 @@ function App() {
           </Layout.Section>
           <Layout.Section oneHalf>
             <Card title="Nominations">
+              <Card.Section>
+                <p>
+                  Movies you nominate will appear here. You may nominate up to a
+                  maxium of 5 movies
+                </p>
+              </Card.Section>
               <ResourceList
                 resourceName={{ singular: "customer", plural: "customers" }}
                 items={nominations}
