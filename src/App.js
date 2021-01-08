@@ -22,7 +22,7 @@ import { debounce } from "lodash";
 
 const apiKey = "172b6f36";
 
-const url = `http://www.omdbapi.com/`;
+const url = `https://www.omdbapi.com/`;
 
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
