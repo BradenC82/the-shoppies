@@ -13,6 +13,7 @@ import {
   ResourceItem,
   Pagination,
   Link,
+  TextContainer,
 } from "@shopify/polaris";
 
 import { useState, useCallback, useEffect } from "react";
@@ -21,9 +22,9 @@ import axios from "axios";
 
 import { debounce } from "lodash";
 
-const apiKey = "172b6f36";
+const apiKey = process.env.REACT_APP_OMDB_PUBLIC_API_KEY;
 
-const url = `https://www.omdbapi.com/`;
+const url = process.env.REACT_APP_OMDB_API_ENDPOINT;
 
 function App() {
   const savedNominations = localStorage.getItem("nominations");
@@ -168,12 +169,14 @@ function App() {
             </Card>
           </Layout.Section>
           <Layout.Section>
-            <p>
-              Made with ☕ by{" "}
-              <Link url="https://bradencollingwood.ca/">
-                Braden Collingwood
-              </Link>
-            </p>
+            <TextContainer>
+              <p>
+                Made with ☕ by{" "}
+                <Link url="https://bradencollingwood.ca/">
+                  Braden Collingwood
+                </Link>
+              </p>
+            </TextContainer>
           </Layout.Section>
         </Layout>
       </Page>
