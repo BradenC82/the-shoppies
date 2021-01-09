@@ -37,7 +37,7 @@ function App() {
 
   const [results, setResults] = useState([]);
 
-  const [totalResults, setTotalResults] = useState([]);
+  const [numResults, setNumResults] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -46,14 +46,16 @@ function App() {
       .get(`${url}?s=${title}&type=movie&page=${pageNumber}&apikey=${apiKey}`)
       .then(response => {
         const { Search, totalResults } = response.data;
-        setTotalResults(totalResults ? totalResults : 0);
+        setNumResults(totalResults ? totalResults : 0);
         setResults(Search ? Search : []);
+        setCurrentPage(1);
       })
       .catch(error => {
         console.log(error);
       });
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedApiCall = useCallback(
     debounce(title => getMovies(title, 1), 500),
     []
@@ -134,7 +136,7 @@ function App() {
                 items={results}
                 renderItem={Result}
                 showHeader
-                totalItemsCount={totalResults}
+                totalItemsCount={numResults}
               />
               <Card.Section>
                 <Pagination
@@ -144,7 +146,7 @@ function App() {
                     getMovies(searchQuery, currentPage - 1);
                     setCurrentPage(currentPage - 1);
                   }}
-                  hasNext={currentPage * 10 < totalResults}
+                  hasNext={currentPage * 10 < numResults}
                   onNext={() => {
                     getMovies(searchQuery, currentPage + 1);
                     setCurrentPage(currentPage + 1);
