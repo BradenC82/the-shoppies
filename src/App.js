@@ -48,7 +48,6 @@ function App() {
         const { Search, totalResults } = response.data;
         setNumResults(totalResults ? totalResults : 0);
         setResults(Search ? Search : []);
-        setCurrentPage(1);
       })
       .catch(error => {
         console.log(error);
@@ -57,7 +56,10 @@ function App() {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedApiCall = useCallback(
-    debounce(title => getMovies(title, 1), 500),
+    debounce(title => {
+      setCurrentPage(1);
+      return getMovies(title, 1);
+    }, 500),
     []
   );
 
@@ -77,13 +79,15 @@ function App() {
     const { Title, Year } = movie;
     return (
       <ResourceItem>
-        <p>{`${Title} - ${Year}`}</p>
-        <Button
-          disabled={nominations.includes(movie) || nominations.length >= 5}
-          onClick={() => setNominations([...nominations, movie])}
-        >
-          Nominate
-        </Button>
+        <TextContainer>
+          <p>{`${Title} - ${Year}`}</p>
+          <Button
+            disabled={nominations.includes(movie) || nominations.length >= 5}
+            onClick={() => setNominations([...nominations, movie])}
+          >
+            Nominate
+          </Button>
+        </TextContainer>
       </ResourceItem>
     );
   };
@@ -93,16 +97,18 @@ function App() {
     const rank = index + 1;
     return (
       <ResourceItem>
-        <p>{`${rank}. ${Title} - ${Year}`}</p>
-        <Button
-          onClick={() =>
-            setNominations(
-              nominations.filter(nomination => nomination.imdbID !== imdbID)
-            )
-          }
-        >
-          Remove
-        </Button>
+        <TextContainer>
+          <p>{`${rank}. ${Title} - ${Year}`}</p>
+          <Button
+            onClick={() =>
+              setNominations(
+                nominations.filter(nomination => nomination.imdbID !== imdbID)
+              )
+            }
+          >
+            Remove
+          </Button>
+        </TextContainer>
       </ResourceItem>
     );
   };
