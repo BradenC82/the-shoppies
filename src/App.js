@@ -12,6 +12,7 @@ import {
   ResourceList,
   ResourceItem,
   Pagination,
+  Link,
 } from "@shopify/polaris";
 
 import { useState, useCallback, useEffect } from "react";
@@ -25,17 +26,29 @@ const apiKey = "172b6f36";
 const url = `https://www.omdbapi.com/`;
 
 function App() {
+  const savedNominations = localStorage.getItem("nominations");
+
+  const [nominations, setNominations] = useState(
+    savedNominations ? JSON.parse(savedNominations) : []
+  );
+
   const [searchQuery, setSearchQuery] = useState("");
+
+  const [results, setResults] = useState([]);
+
+  const [totalResults, setTotalResults] = useState([]);
+
+  const [currentPage, setCurrentPage] = useState(1);
 
   const getMovies = (title, pageNumber) => {
     axios
       .get(`${url}?s=${title}&type=movie&page=${pageNumber}&apikey=${apiKey}`)
-      .then(function (response) {
+      .then(response => {
         const { Search, totalResults } = response.data;
         setTotalResults(totalResults ? totalResults : 0);
         setResults(Search ? Search : []);
       })
-      .catch(function (error) {
+      .catch(error => {
         console.log(error);
       });
   };
@@ -49,24 +62,11 @@ function App() {
     debouncedApiCall(searchQuery);
   }, [searchQuery, debouncedApiCall]);
 
-  const handleChange = newValue => {
+  const handleSearchQueryChange = newValue => {
     setSearchQuery(newValue);
   };
 
-  const [results, setResults] = useState([]);
-
-  const savedNominations = localStorage.getItem("nominations");
-
-  const [nominations, setNominations] = useState(
-    savedNominations ? JSON.parse(savedNominations) : []
-  );
-
-  const [totalResults, setTotalResults] = useState([]);
-
-  const [currentPage, setCurrentPage] = useState(1);
-
   useEffect(() => {
-    console.log("updated localStorage");
     localStorage.setItem("nominations", JSON.stringify(nominations));
   }, [nominations]);
 
@@ -118,7 +118,7 @@ function App() {
           <Layout.Section>
             <Card sectioned>
               <TextField
-                onChange={handleChange}
+                onChange={handleSearchQueryChange}
                 label="Movie title"
                 value={searchQuery}
                 prefix={<Icon source={SearchMinor} color="inkLighter" />}
@@ -166,6 +166,14 @@ function App() {
                 renderItem={Nomination}
               />
             </Card>
+          </Layout.Section>
+          <Layout.Section>
+            <p>
+              Made with ☕ by{" "}
+              <Link url="https://bradencollingwood.ca/">
+                Braden Collingwood
+              </Link>
+            </p>
           </Layout.Section>
         </Layout>
       </Page>
