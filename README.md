@@ -1,5 +1,7 @@
 # The Shoppies
 
+An OMDB movie nomination web app built for Shopify's Summer 2021 Front-end Developer Intern Challenge 
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
