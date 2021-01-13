@@ -37,7 +37,7 @@ function App() {
 
   const [results, setResults] = useState([]);
 
-  const [numResults, setNumResults] = useState([]);
+  const [numResults, setNumResults] = useState(0);
 
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -144,6 +144,13 @@ function App() {
                 showHeader
                 totalItemsCount={numResults}
               />
+              {numResults > 0 && (
+                <Card.Section>
+                  <p>
+                    Showing page {currentPage} of {Math.ceil(numResults / 10)}
+                  </p>
+                </Card.Section>
+              )}
               <Card.Section>
                 <Pagination
                   label="Results"
